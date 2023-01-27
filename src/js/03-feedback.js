@@ -1,46 +1,46 @@
+import throttle from 'lodash.throttle'; 
+
 const formRef = document.querySelector('.feedback-form'); 
-console.log("🚀 formRef", formRef);
+const inputRef = document.querySelector('.feedback-form input'); 
+const textareaRef = document.querySelector('.feedback-form textarea'); 
 
-const inputRef = document.querySelector('.feedback-form input');
-console.log("🚀 inputRef", inputRef); 
-
-// const textareaRef = document.querySelector('.feedback-form textarea');
-// console.log("🚀 textareaRef", textareaRef);
-
-// const buttonRef = document.querySelector('.feedback-form button');
-// console.log("🚀 buttonRef", buttonRef); 
-
-formRef.addEventListener('input', getFieldsForm); 
+formRef.addEventListener('input', throttle(getFieldsForm, 500)); 
+formRef.addEventListener('submit', onFormSubmit);
 
 const FEEDBACK_FORM_STATE = "feedback-form-state"; 
 
-function getFieldsForm(event) {
-// event.preventDefault(); 
-console.log(event.elements.message.value); 
-// localStorage.setItem(FEEDBACK_FORM_STATE, formRef.elements.message.value);
+function getFieldsForm() {
+
+const valuesForm = {
+    mail: formRef.email.value,
+    message: formRef.message.value,   
+}
+const valuesFormJSON = JSON.stringify(valuesForm); 
+
+console.log("🚀 valuesForm", valuesForm);
+
+localStorage.setItem(FEEDBACK_FORM_STATE, valuesFormJSON); 
+
 }
 
-const object = {
-    input: email,
-    textarea: message, 
+populateSavedData();
+
+function onFormSubmit(event) {
+    event.preventDefault(); 
+
+    event.currentTarget.reset();
+    localStorage.removeItem(FEEDBACK_FORM_STATE);    
 }
-console.log(object); 
 
-function getFieldsForm(event) {
-            if(event.target.name === 'email') {
-  object.input = event.target.value; 
-            } else if(event.target.name === 'message')
-   object.textarea = event.target.value; 
-        }
+function populateSavedData() {
 
-// function getFieldsForm(event) {
-//         if(event.target.name === 'email') {
-//     localStorage.setItem(FEEDBACK_FORM_STATE, event.target.value); 
-//         } else if(event.target.name === 'message')
-//     localStorage.setItem(FEEDBACK_FORM_STATE, event.target.value); 
-//     }
-
-
-// buttonRef.addEventListener('submit', event => {
-//     console.log('Форма відправлена', event);
-// }); 
+const savedData = localStorage.getItem(FEEDBACK_FORM_STATE); 
+ 
+const valusParse = JSON.parse(savedData);
+ 
+if(valusParse) {
+    inputRef.value = valusParse.mail; 
+    textareaRef.value = valusParse.message;
+    console.log(valusParse);  
+}
+}
